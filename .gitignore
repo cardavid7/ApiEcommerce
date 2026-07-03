@@ -1,0 +1,41 @@
+# Build results
+[Bb]in/
+[Oo]bj/
+[Oo]ut/
+
+# User-specific files
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Visual Studio / VS Code
+.vs/
+.vscode/
+
+# ASP.NET Core
+appsettings.Development.json
+appsettings.Local.json
+secrets.json
+
+# Logs
+*.log
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# NuGet packages
+*.nupkg
+*.snupkg
+packages/
+
+# Test results
+TestResults/
+
+# Entity Framework / migrations local artifacts
+Migrations/*.cs.sql
+
+# Rider / JetBrains
+.idea/
+*.iml
