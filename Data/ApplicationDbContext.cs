@@ -1,4 +1,7 @@
 using Microsoft.EntityFrameworkCore;
+using ApiEcommerce.Models;
+
+namespace ApiEcommerce.Data;
 
 public class ApplicationDbContext : DbContext
 {

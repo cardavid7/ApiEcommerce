@@ -1,4 +1,6 @@
-namespace Repository.IRepository;
+using ApiEcommerce.Models;
+
+namespace ApiEcommerce.Repository.IRepository;
 
 public interface ICategoryRepository
 {

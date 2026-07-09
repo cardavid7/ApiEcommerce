@@ -1,4 +1,8 @@
-using Repository.IRepository;
+using ApiEcommerce.Repository.IRepository;
+using ApiEcommerce.Models;
+using ApiEcommerce.Data;
+
+namespace ApiEcommerce.Repository;
 
 public class CategoryRepository : ICategoryRepository
 {

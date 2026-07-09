@@ -1,5 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 
+namespace ApiEcommerce.Models.Dtos;
+
 public class CreateCategoryDto
 {
     [Required(ErrorMessage = "Name is required")]
