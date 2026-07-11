@@ -40,9 +40,9 @@ public class CategoryRepository : ICategoryRepository
         return _dbContext.Categories.OrderBy(c => c.Name).ToList();
     }
 
-    public Category GetCategoryById(int categoryId)
+    public Category? GetCategoryById(int categoryId)
     {
-        return _dbContext.Categories.FirstOrDefault(c => c.Id == categoryId) ?? throw new InvalidOperationException($"Category with ID {categoryId} not found.");
+        return _dbContext.Categories.FirstOrDefault(c => c.Id == categoryId);
     }
 
     public bool Save()
