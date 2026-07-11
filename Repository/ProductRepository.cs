@@ -2,7 +2,7 @@ using System;
 using ApiEcommerce.Models;
 using ApiEcommerce.Repository.IRepository;
 
-namespace ApiEcommerce;
+namespace ApiEcommerce.Repository;
 
 public class ProductRepository : IProductRepository
 {
