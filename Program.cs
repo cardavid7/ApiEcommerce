@@ -8,6 +8,7 @@ var dbConnectionString = builder.Configuration.GetConnectionString("ConexionSql"
 // Add services to the container.
 builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(dbConnectionString));
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
+builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddAutoMapper(cfg =>
 {
     cfg.AddMaps(typeof(Program).Assembly);

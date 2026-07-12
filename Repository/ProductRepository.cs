@@ -1,6 +1,7 @@
 using System;
 using ApiEcommerce.Models;
 using ApiEcommerce.Repository.IRepository;
+using Microsoft.EntityFrameworkCore;
 
 namespace ApiEcommerce.Repository;
 
@@ -25,7 +26,7 @@ public class ProductRepository : IProductRepository
         }
         product.Stock -= quantity;
         _dbContext.Products.Update(product);
-        return true;
+        return Save();
     }
 
     public bool CreateProduct(Product product)
@@ -52,7 +53,7 @@ public class ProductRepository : IProductRepository
 
     public ICollection<Product> GetAllProducts()
     {
-        return _dbContext.Products.OrderBy(p => p.Name).ToList();
+        return _dbContext.Products.Include(p => p.Category).OrderBy(p => p.Name).ToList();
     }
 
     public Product? GetProductById(int productId)
@@ -61,7 +62,7 @@ public class ProductRepository : IProductRepository
         {
             return null;
         }
-        return _dbContext.Products.FirstOrDefault(p => p.Id == productId);
+        return _dbContext.Products.Include(p => p.Category).FirstOrDefault(p => p.Id == productId);
     }
 
     public ICollection<Product> GetProductsForCategory(int categoryId)
@@ -70,7 +71,7 @@ public class ProductRepository : IProductRepository
         {
             return new List<Product>();
         }
-        return _dbContext.Products.Where(p => p.CategoryId == categoryId).OrderBy(p => p.Name).ToList();
+        return _dbContext.Products.Include(p => p.Category).Where(p => p.CategoryId == categoryId).OrderBy(p => p.Name).ToList();
     }
 
     public bool ProductExists(int productId)
@@ -98,11 +99,18 @@ public class ProductRepository : IProductRepository
 
     public ICollection<Product> SearchProducts(string searchItem)
     {
-        IQueryable<Product> query = _dbContext.Products;
-        if (!string.IsNullOrWhiteSpace(searchItem))
+        if (string.IsNullOrWhiteSpace(searchItem))
         {
-            query = query.Where(p => p.Name.ToLower().Trim().Contains(searchItem.ToLower().Trim()));
+            return new List<Product>();
         }
+
+        var searchItemLower = searchItem.ToLower().Trim();
+
+        IQueryable<Product> query = _dbContext.Products.Include(p => p.Category);
+        query = query.Where(
+            p => p.Name.ToLower().Trim().Contains(searchItemLower) || 
+            p.Description.ToLower().Trim().Contains(searchItemLower));
+        
         return query.OrderBy(p => p.Name).ToList();
     }
 
