@@ -36,7 +36,7 @@ namespace ApiEcommerce.Controllers
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public IActionResult GetProductById(int id)
         {
             var product = _productRepository.GetProductById(id);
