@@ -78,7 +78,7 @@ namespace ApiEcommerce.Controllers
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> LoginUser([FromBody] UserLoginDto userLoginDto)
         {
             if (userLoginDto == null || !ModelState.IsValid)
