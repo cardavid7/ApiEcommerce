@@ -86,7 +86,7 @@ namespace ApiEcommerce.Controllers
             return CreatedAtRoute("GetProductById", new { id = product.Id }, _mapper.Map<ProductDto>(createdProduct));
         }
 
-        [HttpGet("searchByCategory/{categoryId:int}", Name = "GetProductsForCategory")]
+        [HttpGet("SearchByCategory/{categoryId:int}", Name = "GetProductsForCategory")]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -103,7 +103,7 @@ namespace ApiEcommerce.Controllers
             return Ok(productsDto);
         }
 
-        [HttpGet("searchByNameOrDescription/{searchItem}", Name = "SearchProducts")]
+        [HttpGet("SearchByNameOrDescription/{searchItem}", Name = "SearchProducts")]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
