@@ -2,6 +2,7 @@ using ApiEcommerce.Models;
 using ApiEcommerce.Models.Dtos;
 using ApiEcommerce.Repository.IRepository;
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,6 +10,7 @@ namespace ApiEcommerce.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class ProductsController : ControllerBase
     {
         private readonly IProductRepository _productRepository;
@@ -22,6 +24,7 @@ namespace ApiEcommerce.Controllers
             _mapper = mapper;
         }
 
+        [AllowAnonymous]
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -32,6 +35,7 @@ namespace ApiEcommerce.Controllers
             return Ok(productsDto);
         }
 
+        [AllowAnonymous]
         [HttpGet("{id:int}", Name = "GetProductById")]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -85,6 +89,7 @@ namespace ApiEcommerce.Controllers
         [HttpGet("searchByCategory/{categoryId:int}", Name = "GetProductsForCategory")]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public IActionResult GetProductsForCategory(int categoryId)
@@ -101,6 +106,7 @@ namespace ApiEcommerce.Controllers
         [HttpGet("searchByNameOrDescription/{searchItem}", Name = "SearchProducts")]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public IActionResult SearchProducts(string searchItem)
@@ -117,6 +123,7 @@ namespace ApiEcommerce.Controllers
         [HttpPatch("BuyProduct/{name}/{quantity:int}", Name = "BuyProduct")]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public IActionResult BuyProduct(string name, int quantity)
@@ -202,6 +209,5 @@ namespace ApiEcommerce.Controllers
             }
             return Ok($"Product {product.Name} deleted successfully.");
         }
-
     }
 }
