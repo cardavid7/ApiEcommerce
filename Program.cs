@@ -1,5 +1,6 @@
 using System.Text;
 using ApiEcommerce.Constants;
+using ApiEcommerce.OpenApi;
 using ApiEcommerce.Repository;
 using ApiEcommerce.Repository.IRepository;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -45,7 +46,11 @@ builder.Services.AddAuthentication(options =>
 
 builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
+builder.Services.AddOpenApi(options =>
+{
+    options.AddDocumentTransformer<BearerSecuritySchemeTransformer>();
+    options.AddOperationTransformer<SecurityRequirementTransformer>();
+});
 
 //CORS
 builder.Services.AddCors(options =>
