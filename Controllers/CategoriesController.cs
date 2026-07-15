@@ -13,7 +13,7 @@ namespace ApiEcommerce.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
+    [Authorize(Roles = "Admin")]
     //[EnableCors(PolicyNames.AllowSpecificOrigin)]
     public class CategoriesController : ControllerBase
     {
