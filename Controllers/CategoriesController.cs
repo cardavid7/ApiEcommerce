@@ -47,7 +47,7 @@ namespace ApiEcommerce.Controllers
 
         [AllowAnonymous]
         // [ResponseCache(Duration = 10)]
-        [ResponseCache(CacheProfileName = "Default10")]
+        [ResponseCache(CacheProfileName = CacheProfiles.Default10)]
         [HttpGet("{id:int}", Name = "GetCategoryById")]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
