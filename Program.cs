@@ -58,13 +58,6 @@ builder.Services.AddControllers(options =>
     options.CacheProfiles.Add(CacheProfiles.Default10, CacheProfiles.Profile10);
     options.CacheProfiles.Add(CacheProfiles.Default20, CacheProfiles.Profile20);
 });
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi(options =>
-{
-    options.AddDocumentTransformer<BearerSecuritySchemeTransformer>();
-    options.AddOperationTransformer<SecurityRequirementTransformer>();
-});
-
 //Api versioning
 var apiVersioningBuilder = builder.Services.AddApiVersioning(option =>
 {
@@ -78,6 +71,21 @@ apiVersioningBuilder.AddApiExplorer(option =>
 {
     option.GroupNameFormat = "'v'VVV"; // v1,v2,v3...
     option.SubstituteApiVersionInUrl = true; // api/v{version}/products
+});
+
+// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
+// Un documento OpenAPI por cada version de la api (v1, v2), filtrado por GroupName
+builder.Services.AddOpenApi("v1", options =>
+{
+    options.ShouldInclude = description => description.GroupName == "v1";
+    options.AddDocumentTransformer<BearerSecuritySchemeTransformer>();
+    options.AddOperationTransformer<SecurityRequirementTransformer>();
+});
+builder.Services.AddOpenApi("v2", options =>
+{
+    options.ShouldInclude = description => description.GroupName == "v2";
+    options.AddDocumentTransformer<BearerSecuritySchemeTransformer>();
+    options.AddOperationTransformer<SecurityRequirementTransformer>();
 });
 
 //CORS
@@ -99,6 +107,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI(options =>
     {
         options.SwaggerEndpoint("/openapi/v1.json", "Mi API v1 (.NET 10)");
+        options.SwaggerEndpoint("/openapi/v2.json", "Mi API v2 (.NET 10)");
     });
 }
 
