@@ -80,12 +80,14 @@ builder.Services.AddOpenApi("v1", options =>
     options.ShouldInclude = description => description.GroupName == "v1";
     options.AddDocumentTransformer<BearerSecuritySchemeTransformer>();
     options.AddOperationTransformer<SecurityRequirementTransformer>();
+    options.AddOperationTransformer<DeprecatedOperationTransformer>();
 });
 builder.Services.AddOpenApi("v2", options =>
 {
     options.ShouldInclude = description => description.GroupName == "v2";
     options.AddDocumentTransformer<BearerSecuritySchemeTransformer>();
     options.AddOperationTransformer<SecurityRequirementTransformer>();
+    options.AddOperationTransformer<DeprecatedOperationTransformer>();
 });
 
 //CORS
