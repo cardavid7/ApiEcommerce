@@ -156,7 +156,7 @@ public class UserRepository : IUserRepository
             }
             await _userManager.AddToRoleAsync(user, userRole);
 
-            var createdUser = _dbContext.ApplicationUsers.FirstOrDefaultAsync(u => u.UserName != null && u.UserName.ToLower().Trim() == createUserDto.UserName.ToLower().Trim());
+            var createdUser = await _dbContext.ApplicationUsers.FirstOrDefaultAsync(u => u.UserName != null && u.UserName.ToLower().Trim() == createUserDto.UserName.ToLower().Trim());
             return _mapper.Map<UserDataDto>(createdUser);
         }
         var errors = string.Join(", ", result.Errors.Select(e => e.Description));
