@@ -124,16 +124,24 @@ public class UserRepository : IUserRepository
         };
     }
 
-    public async Task<UserDataDto> Register(CreateUserDto createUserDto)
+    public async Task<UserRegisterResponseDto> Register(CreateUserDto createUserDto)
     {
         if (string.IsNullOrEmpty(createUserDto.UserName))
         {
-            throw new ArgumentNullException("UserName is required");
+            return new UserRegisterResponseDto
+            {
+                IsSuccess = false,
+                Message = "UserName is required"
+            };
         }
 
         if (string.IsNullOrEmpty(createUserDto.Password))
         {
-            throw new ArgumentNullException("Password is required");
+            return new UserRegisterResponseDto
+            {
+                IsSuccess = false,
+                Message = "Password is required"
+            };
         }
 
         var user = new ApplicationUser()
@@ -145,21 +153,31 @@ public class UserRepository : IUserRepository
         };
 
         var result = await _userManager.CreateAsync(user, createUserDto.Password);
-        if (result.Succeeded)
+        if (!result.Succeeded)
         {
-            var userRole = createUserDto.Role ?? "User";
-            bool roleExist = await _roleManager.RoleExistsAsync(userRole);
-            if (!roleExist)
+            var errors = string.Join(", ", result.Errors.Select(e => e.Description));
+            return new UserRegisterResponseDto
             {
-                var identityRole = new IdentityRole(userRole);
-                await _roleManager.CreateAsync(identityRole);
-            }
-            await _userManager.AddToRoleAsync(user, userRole);
-
-            var createdUser = await _dbContext.ApplicationUsers.FirstOrDefaultAsync(u => u.UserName != null && u.UserName.ToLower().Trim() == createUserDto.UserName.ToLower().Trim());
-            return _mapper.Map<UserDataDto>(createdUser);
+                IsSuccess = false,
+                Message = $"Error registering the user: {errors}"
+            };
         }
-        var errors = string.Join(", ", result.Errors.Select(e => e.Description));
-        throw new ApplicationException($"Error registering the user : {errors}");
+
+        var userRole = createUserDto.Role ?? "User";
+        bool roleExist = await _roleManager.RoleExistsAsync(userRole);
+        if (!roleExist)
+        {
+            var identityRole = new IdentityRole(userRole);
+            await _roleManager.CreateAsync(identityRole);
+        }
+        await _userManager.AddToRoleAsync(user, userRole);
+
+        var createdUser = await _dbContext.ApplicationUsers.FirstOrDefaultAsync(u => u.UserName != null && u.UserName.ToLower().Trim() == createUserDto.UserName.ToLower().Trim());
+        return new UserRegisterResponseDto
+        {
+            IsSuccess = true,
+            Message = "User successfully registered",
+            User = _mapper.Map<UserDataDto>(createdUser)
+        };
     }
 }

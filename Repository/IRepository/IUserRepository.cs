@@ -10,5 +10,5 @@ public interface IUserRepository
     public ApplicationUser? GetUserById(string id);
     public bool IsUniqueUser(string username);
     public Task<UserLoginResponseDto> Login(UserLoginDto userLoginDto);
-    public Task<UserDataDto> Register(CreateUserDto createUserDto);
+    public Task<UserRegisterResponseDto> Register(CreateUserDto createUserDto);
 }
