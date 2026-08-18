@@ -34,14 +34,14 @@ public class UserRepository : IUserRepository
         _mapper = mapper;
     }
 
-    public User? GetUserById(int id)
+    public ApplicationUser? GetUserById(string id)
     {
-        return _dbContext.Users.FirstOrDefault(u => u.Id == id);
+        return _dbContext.ApplicationUsers.FirstOrDefault(u => u.Id == id);
     }
 
-    public ICollection<User> GetUsers()
+    public ICollection<ApplicationUser> GetUsers()
     {
-        return _dbContext.Users.OrderBy(u => u.UserName).ToList();
+        return _dbContext.ApplicationUsers.OrderBy(u => u.UserName).ToList();
     }
 
     public bool IsUniqueUser(string username)
