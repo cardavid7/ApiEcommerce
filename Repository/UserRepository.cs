@@ -159,6 +159,7 @@ public class UserRepository : IUserRepository
             var createdUser = _dbContext.ApplicationUsers.FirstOrDefaultAsync(u => u.UserName != null && u.UserName.ToLower().Trim() == createUserDto.UserName.ToLower().Trim());
             return _mapper.Map<UserDataDto>(createdUser);
         }
-        throw new ApplicationException("Error registering the user");
+        var errors = string.Join(", ", result.Errors.Select(e => e.Description));
+        throw new ApplicationException($"Error registering the user : {errors}");
     }
 }

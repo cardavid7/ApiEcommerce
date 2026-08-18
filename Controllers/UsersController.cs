@@ -52,7 +52,7 @@ namespace ApiEcommerce.Controllers
         }
 
         [AllowAnonymous]
-        [HttpPost(Name = "RegisterUser")]
+        [HttpPost("Register", Name = "RegisterUser")]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
