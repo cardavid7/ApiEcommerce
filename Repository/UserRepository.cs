@@ -1,5 +1,6 @@
 using System;
 using System.IdentityModel.Tokens.Jwt;
+using System.Linq.Expressions;
 using System.Security.Claims;
 using System.Text;
 using ApiEcommerce.Models;
@@ -8,6 +9,8 @@ using ApiEcommerce.Repository.IRepository;
 using AutoMapper;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
+using Microsoft.Identity.Client;
 using Microsoft.IdentityModel.Tokens;
 
 namespace ApiEcommerce.Repository;
@@ -69,7 +72,7 @@ public class UserRepository : IUserRepository
             };
         }
 
-        if (userLoginDto.Password == null)
+        if (string.IsNullOrEmpty(userLoginDto.Password))
         {
             return new UserLoginResponseDto()
             {
@@ -121,18 +124,41 @@ public class UserRepository : IUserRepository
         };
     }
 
-    public async Task<User> Register(CreateUserDto createUserDto)
+    public async Task<UserDataDto> Register(CreateUserDto createUserDto)
     {
-        var encryptedPassword = BCrypt.Net.BCrypt.HashPassword(createUserDto.Password);
-        var user = new User()
+        if (string.IsNullOrEmpty(createUserDto.UserName))
         {
-            Name = createUserDto.Name,
+            throw new ArgumentNullException("UserName is required");
+        }
+
+        if (string.IsNullOrEmpty(createUserDto.Password))
+        {
+            throw new ArgumentNullException("Password is required");
+        }
+
+        var user = new ApplicationUser()
+        {
             UserName = createUserDto.UserName,
-            Password = encryptedPassword,
-            Role = createUserDto.Role
+            Email = createUserDto.UserName,
+            NormalizedEmail = createUserDto.UserName.ToUpper(),
+            Name = createUserDto.Name
         };
-        _dbContext.Users.Add(user);
-        await _dbContext.SaveChangesAsync();
-        return user;
+
+        var result = await _userManager.CreateAsync(user, createUserDto.Password);
+        if (result.Succeeded)
+        {
+            var userRole = createUserDto.Role ?? "User";
+            bool roleExist = await _roleManager.RoleExistsAsync(userRole);
+            if (!roleExist)
+            {
+                var identityRole = new IdentityRole(userRole);
+                await _roleManager.CreateAsync(identityRole);
+            }
+            await _userManager.AddToRoleAsync(user, userRole);
+
+            var createdUser = _dbContext.ApplicationUsers.FirstOrDefaultAsync(u => u.UserName != null && u.UserName.ToLower().Trim() == createUserDto.UserName.ToLower().Trim());
+            return _mapper.Map<UserDataDto>(createdUser);
+        }
+        throw new ApplicationException("Error registering the user");
     }
 }
