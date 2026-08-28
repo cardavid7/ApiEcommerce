@@ -253,9 +253,8 @@ namespace ApiEcommerce.Controllers
                 return StatusCode(500, ModelState);
             }
 
-            var UpdatedProduct = _productRepository.GetProductById(id);
-            updateProductDto = _mapper.Map<UpdateProductDto>(UpdatedProduct);
-            return Ok(updateProductDto);
+            var updatedProduct = _productRepository.GetProductById(id);
+            return Ok(_mapper.Map<ProductDto>(updatedProduct));
         }
 
         [HttpDelete("{id:int}", Name = "DeleteProduct")]

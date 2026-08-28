@@ -12,7 +12,6 @@ public class CreateProductDto
     public string Description { get; set; } = string.Empty;
     [Required(ErrorMessage = "Price is required")]
     public decimal Price { get; set; }
-    public string? ImgUrl { get; set; }
     public IFormFile? Image { get; set; }
     
     [Required(ErrorMessage = "SKU is required")]
