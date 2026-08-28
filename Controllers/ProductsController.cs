@@ -84,24 +84,7 @@ namespace ApiEcommerce.Controllers
             //add product image
             if (createProductDto.Image != null && createProductDto.Image.Length > 0)
             {
-                string fileName = Guid.NewGuid().ToString() + Path.GetExtension(createProductDto.Image.FileName);
-                string imagesFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "ProductsImages");
-                if (!Directory.Exists(imagesFolder))
-                {
-                    Directory.CreateDirectory(imagesFolder);
-                }
-                string filePath = Path.Combine(imagesFolder, fileName);
-                FileInfo fileInfo = new FileInfo(filePath);
-                if (fileInfo.Exists)
-                {
-                    fileInfo.Delete();
-                }
-                using var fileStream = new FileStream(filePath, FileMode.Create);
-                createProductDto.Image.CopyTo(fileStream);
-                var baseUrl = $"{HttpContext.Request.Scheme}://{HttpContext.Request.Host.Value}{HttpContext.Request.PathBase.Value}";
-                product.ImgUrl = $"{baseUrl}/ProductsImages/{fileName}";
-                product.ImgUrlLocal = filePath;
-                
+                UploadProductImage(product, createProductDto.Image);
             }
             else
             {
@@ -214,35 +197,14 @@ namespace ApiEcommerce.Controllers
             //add product image
             if (updateProductDto.Image != null && updateProductDto.Image.Length > 0)
             {
-                string fileName = Guid.NewGuid().ToString() + Path.GetExtension(updateProductDto.Image.FileName);
-                string imagesFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "ProductsImages");
-                if (!Directory.Exists(imagesFolder))
-                {
-                    Directory.CreateDirectory(imagesFolder);
-                }
-                string filePath = Path.Combine(imagesFolder, fileName);
-                FileInfo fileInfo = new FileInfo(filePath);
-                if (fileInfo.Exists)
-                {
-                    fileInfo.Delete();
-                }
-                using (var fileStream = new FileStream(filePath, FileMode.Create))
-                {
-                    updateProductDto.Image.CopyTo(fileStream);
-                }
-                var baseUrl = $"{HttpContext.Request.Scheme}://{HttpContext.Request.Host.Value}{HttpContext.Request.PathBase.Value}";
-                product.ImgUrl = $"{baseUrl}/ProductsImages/{fileName}";
-                product.ImgUrlLocal = filePath;
+                UploadProductImage(product, updateProductDto.Image);
 
-                // borrar la imagen anterior si existía en disco
-                if (!string.IsNullOrEmpty(existingProduct.ImgUrlLocal) && System.IO.File.Exists(existingProduct.ImgUrlLocal))
-                {
-                    System.IO.File.Delete(existingProduct.ImgUrlLocal);
-                }
+                // Delete the old image from the local file system if it exists
+                DeleteProductImage(existingProduct.ImgUrlLocal);
             }
             else
             {
-                // no se envió imagen nueva: conservar la que ya tiene el producto
+                // dont change the ImgUrl and ImgUrlLocal properties if no new image is provided
                 product.ImgUrl = existingProduct.ImgUrl;
                 product.ImgUrlLocal = existingProduct.ImgUrlLocal;
             }
@@ -282,6 +244,37 @@ namespace ApiEcommerce.Controllers
                 return StatusCode(500, ModelState);
             }
             return Ok($"Product {product.Name} deleted successfully.");
+        }
+
+        // Save the received image in wwwroot/ProductsImages and assign
+        // ImgUrl (public URL) and ImgUrlLocal (physical path) to the product
+        private void UploadProductImage(Product product, IFormFile image)
+        {
+            string fileName = Guid.NewGuid().ToString() + Path.GetExtension(image.FileName);
+            string imagesFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "ProductsImages");
+            if (!Directory.Exists(imagesFolder))
+            {
+                Directory.CreateDirectory(imagesFolder);
+            }
+
+            string filePath = Path.Combine(imagesFolder, fileName);
+            using (var fileStream = new FileStream(filePath, FileMode.Create))
+            {
+                image.CopyTo(fileStream);
+            }
+
+            var baseUrl = $"{HttpContext.Request.Scheme}://{HttpContext.Request.Host.Value}{HttpContext.Request.PathBase.Value}";
+            product.ImgUrl = $"{baseUrl}/ProductsImages/{fileName}";
+            product.ImgUrlLocal = filePath;
+        }
+
+        // Delete the product image from the local file system if it exists.
+        private static void DeleteProductImage(string? imgUrlLocal)
+        {
+            if (!string.IsNullOrEmpty(imgUrlLocal) && System.IO.File.Exists(imgUrlLocal))
+            {
+                System.IO.File.Delete(imgUrlLocal);
+            }
         }
     }
 }
