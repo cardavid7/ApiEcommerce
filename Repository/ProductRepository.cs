@@ -62,7 +62,7 @@ public class ProductRepository : IProductRepository
         {
             return null;
         }
-        return _dbContext.Products.Include(p => p.Category).FirstOrDefault(p => p.Id == productId);
+        return _dbContext.Products.Include(p => p.Category).AsNoTracking().FirstOrDefault(p => p.Id == productId);
     }
 
     public ICollection<Product> GetProductsForCategory(int categoryId)
@@ -121,6 +121,16 @@ public class ProductRepository : IProductRepository
             return false;
         }
         product.UpdateDate = DateTime.Now;
+        // conservar la fecha de creación original (Update marca todas las columnas como modificadas)
+        var originalCreationDate = _dbContext.Products
+            .AsNoTracking()
+            .Where(p => p.Id == product.Id)
+            .Select(p => (DateTime?)p.CreationDate)
+            .FirstOrDefault();
+        if (originalCreationDate.HasValue)
+        {
+            product.CreationDate = originalCreationDate.Value;
+        }
         _dbContext.Products.Update(product);
         return Save();
     }

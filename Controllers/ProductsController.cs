@@ -56,11 +56,12 @@ namespace ApiEcommerce.Controllers
         }
 
         [HttpPost]
+        [Consumes("multipart/form-data")]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status201Created)]
-        public IActionResult CreateProduct([FromBody] CreateProductDto createProductDto)
+        public IActionResult CreateProduct([FromForm] CreateProductDto createProductDto)
         {
             if (createProductDto == null)
             {
@@ -79,6 +80,34 @@ namespace ApiEcommerce.Controllers
                 return BadRequest($"Product with name {createProductDto.Name} already exists.");
             }
             var product = _mapper.Map<Product>(createProductDto);
+
+            //add product image
+            if (createProductDto.Image != null && createProductDto.Image.Length > 0)
+            {
+                string fileName = Guid.NewGuid().ToString() + Path.GetExtension(createProductDto.Image.FileName);
+                string imagesFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "ProductsImages");
+                if (!Directory.Exists(imagesFolder))
+                {
+                    Directory.CreateDirectory(imagesFolder);
+                }
+                string filePath = Path.Combine(imagesFolder, fileName);
+                FileInfo fileInfo = new FileInfo(filePath);
+                if (fileInfo.Exists)
+                {
+                    fileInfo.Delete();
+                }
+                using var fileStream = new FileStream(filePath, FileMode.Create);
+                createProductDto.Image.CopyTo(fileStream);
+                var baseUrl = $"{HttpContext.Request.Scheme}://{HttpContext.Request.Host.Value}{HttpContext.Request.PathBase.Value}";
+                product.ImgUrl = $"{baseUrl}/ProductsImages/{fileName}";
+                product.ImgUrlLocal = filePath;
+                
+            }
+            else
+            {
+                product.ImgUrl = "https://placehold.co/300x300";
+            }
+
             if (!_productRepository.CreateProduct(product))
             {
                 ModelState.AddModelError("CustomError", $"Something went wrong when saving the product {product.Name}.");
@@ -149,12 +178,13 @@ namespace ApiEcommerce.Controllers
         }
 
         [HttpPut("{id:int}", Name = "UpdateProduct")]
+        [Consumes("multipart/form-data")]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public IActionResult UpdateProduct(int id, [FromBody] UpdateProductDto updateProductDto)
+        public IActionResult UpdateProduct(int id, [FromForm] UpdateProductDto updateProductDto)
         {
             if (updateProductDto == null || id <= 0)
             {
@@ -172,8 +202,50 @@ namespace ApiEcommerce.Controllers
                 return BadRequest(ModelState);
             }
 
+            var existingProduct = _productRepository.GetProductById(id);
+            if (existingProduct == null)
+            {
+                return NotFound($"Product with ID {id} not found.");
+            }
+
             var product = _mapper.Map<Product>(updateProductDto);
             product.Id = id;
+
+            //add product image
+            if (updateProductDto.Image != null && updateProductDto.Image.Length > 0)
+            {
+                string fileName = Guid.NewGuid().ToString() + Path.GetExtension(updateProductDto.Image.FileName);
+                string imagesFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "ProductsImages");
+                if (!Directory.Exists(imagesFolder))
+                {
+                    Directory.CreateDirectory(imagesFolder);
+                }
+                string filePath = Path.Combine(imagesFolder, fileName);
+                FileInfo fileInfo = new FileInfo(filePath);
+                if (fileInfo.Exists)
+                {
+                    fileInfo.Delete();
+                }
+                using (var fileStream = new FileStream(filePath, FileMode.Create))
+                {
+                    updateProductDto.Image.CopyTo(fileStream);
+                }
+                var baseUrl = $"{HttpContext.Request.Scheme}://{HttpContext.Request.Host.Value}{HttpContext.Request.PathBase.Value}";
+                product.ImgUrl = $"{baseUrl}/ProductsImages/{fileName}";
+                product.ImgUrlLocal = filePath;
+
+                // borrar la imagen anterior si existía en disco
+                if (!string.IsNullOrEmpty(existingProduct.ImgUrlLocal) && System.IO.File.Exists(existingProduct.ImgUrlLocal))
+                {
+                    System.IO.File.Delete(existingProduct.ImgUrlLocal);
+                }
+            }
+            else
+            {
+                // no se envió imagen nueva: conservar la que ya tiene el producto
+                product.ImgUrl = existingProduct.ImgUrl;
+                product.ImgUrlLocal = existingProduct.ImgUrlLocal;
+            }
 
             if (!_productRepository.UpdateProduct(product))
             {

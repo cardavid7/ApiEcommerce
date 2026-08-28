@@ -18,6 +18,9 @@ appsettings.Development.json
 appsettings.Local.json
 secrets.json
 
+# Uploaded product images (user content, no debe versionarse)
+/wwwroot/ProductsImages/
+
 # Logs
 *.log
 
