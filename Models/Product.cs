@@ -8,23 +8,33 @@ public class Product
 {
     [Key]
     public int Id { get; set; }
+
     [Required]
     public string Name { get; set; } = string.Empty;
+
     public string Description { get; set; } = string.Empty;
 
     [Range(0, double.MaxValue, ErrorMessage = "Price must be a positive value.")]
     [Column(TypeName = "decimal(18,2)")]
     public decimal Price { get; set; }
-    public string ImgUrl { get; set; } = string.Empty;
+
+    public string? ImgUrl { get; set; }
+
+    public string? ImgUrlLocal { get; set; }
+
     [Required]
     public string SKU { get; set; } = string.Empty; // PROD-001-BLK-M
+
     [Range(0, int.MaxValue, ErrorMessage = "Stock must be a positive value.")]
     public int Stock { get; set; }
+
     public DateTime CreationDate { get; set; } = DateTime.Now;
+
     public DateTime? UpdateDate { get; set; } = null;
 
     // Foreign key for Category
     public int CategoryId { get; set; }
+    
     [ForeignKey("CategoryId")]
     public required Category Category { get; set; }
 
