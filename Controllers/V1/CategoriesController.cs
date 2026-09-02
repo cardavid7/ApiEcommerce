@@ -116,7 +116,7 @@ namespace ApiEcommerce.Controllers.V1
                 return BadRequest(ModelState);
             }
 
-            if (_categoryRepository.CategoryExists(categoryDto.Name))
+            if (_categoryRepository.CategoryExists(categoryDto.Name, id))
             {
                 ModelState.AddModelError("CustomError", "Category already exists!");
                 return BadRequest(ModelState);

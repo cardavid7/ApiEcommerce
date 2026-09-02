@@ -24,6 +24,12 @@ public class CategoryRepository : ICategoryRepository
         return _dbContext.Categories.Any(c => c.Name.ToLower().Trim() == categoryName.ToLower().Trim());
     }
 
+    public bool CategoryExists(string categoryName, int excludeId)
+    {
+        return _dbContext.Categories.Any(c => c.Id != excludeId &&
+            c.Name.ToLower().Trim() == categoryName.ToLower().Trim());
+    }
+
     public bool CreateCategory(Category category)
     {
         category.CreationDate = DateTime.Now;
