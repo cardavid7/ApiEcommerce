@@ -7,7 +7,7 @@ using ApiEcommerce.Data;
 using ApiEcommerce.Models;
 using ApiEcommerce.Models.Dtos;
 using ApiEcommerce.Repository.IRepository;
-using AutoMapper;
+using Mapster; // Antes: using AutoMapper; (migrado a Mapster, se usa el metodo de extension Adapt())
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
@@ -22,17 +22,19 @@ public class UserRepository : IUserRepository
     private readonly string? _secretKey;
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly RoleManager<IdentityRole> _roleManager;
-    private readonly IMapper _mapper;
+    // Con Mapster se usa el metodo de extension Adapt() sobre el objeto origen,
+    // por lo que ya no se inyecta ningun mapper.
+    // Antes (AutoMapper): private readonly IMapper _mapper;
 
     public UserRepository(ApplicationDbContext dbContext, IConfiguration configuration,
-        UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager,
-        IMapper mapper)
+        UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
+    // Antes: UserRepository(..., RoleManager<IdentityRole> roleManager, IMapper mapper)
     {
         _dbContext = dbContext;
         _secretKey = configuration.GetValue<string>("ApiSettings:SecretKey");
         _userManager = userManager;
         _roleManager = roleManager;
-        _mapper = mapper;
+        // Antes: _mapper = mapper;
     }
 
     public ApplicationUser? GetUserById(string id)
@@ -124,7 +126,7 @@ public class UserRepository : IUserRepository
         };
         
         var token = handlerToken.CreateToken(tokenDescriptor);
-        var userData = _mapper.Map<UserDataDto>(user);
+        var userData = user.Adapt<UserDataDto>(); // Antes: _mapper.Map<UserDataDto>(user);
         userData.Roles = roles.ToList();
         return new UserLoginResponseDto()
         {
@@ -185,7 +187,7 @@ public class UserRepository : IUserRepository
         await _userManager.AddToRoleAsync(user, userRole);
 
         var createdUser = await _dbContext.ApplicationUsers.FirstOrDefaultAsync(u => u.UserName != null && u.UserName.ToLower().Trim() == createUserDto.UserName.ToLower().Trim());
-        var userData = _mapper.Map<UserDataDto>(createdUser);
+        var userData = createdUser.Adapt<UserDataDto>(); // Antes: _mapper.Map<UserDataDto>(createdUser);
         userData.Roles = createdUser != null ? (await _userManager.GetRolesAsync(createdUser)).ToList() : new List<string>();
         return new UserRegisterResponseDto
         {

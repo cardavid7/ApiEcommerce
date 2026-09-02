@@ -3,7 +3,7 @@ using ApiEcommerce.Models;
 using ApiEcommerce.Models.Dtos;
 using ApiEcommerce.Repository.IRepository;
 using Asp.Versioning;
-using AutoMapper;
+using Mapster; // Antes: using AutoMapper; (migrado a Mapster, se usa el metodo de extension Adapt())
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 
@@ -21,12 +21,14 @@ namespace ApiEcommerce.Controllers.V1
     public class CategoriesController : ControllerBase
     {
         private readonly ICategoryRepository _categoryRepository;
-        private readonly IMapper _mapper;
+        // Con Mapster se usa el metodo de extension Adapt(); ya no se inyecta un mapper.
+        // Antes (AutoMapper): private readonly IMapper _mapper;
 
-        public CategoriesController(ICategoryRepository categoryRepository, IMapper mapper)
+        public CategoriesController(ICategoryRepository categoryRepository)
+        // Antes: CategoriesController(ICategoryRepository categoryRepository, IMapper mapper)
         {
             _categoryRepository = categoryRepository;
-            _mapper = mapper;
+            // Antes: _mapper = mapper;
         }
 
         [AllowAnonymous]
@@ -38,12 +40,12 @@ namespace ApiEcommerce.Controllers.V1
         public IActionResult GetCategories()
         {
             var categories = _categoryRepository.GetAllCategories();
-            //var categoriesDto = _mapper.Map<ICollection<CategoryDto>>(categories);
-            
+            //var categoriesDto = categories.Adapt<ICollection<CategoryDto>>();
+
             var categoriesDto = new List<CategoryDto>();
             foreach (var category in categories)
             {
-                categoriesDto.Add(_mapper.Map<CategoryDto>(category));
+                categoriesDto.Add(category.Adapt<CategoryDto>()); // Antes: _mapper.Map<CategoryDto>(category)
             }
             
             return Ok(categoriesDto);
@@ -65,7 +67,7 @@ namespace ApiEcommerce.Controllers.V1
             {
                 return NotFound($"Category with ID {id} not found.");
             }
-            var categoryDto = _mapper.Map<CategoryDto>(category);
+            var categoryDto = category.Adapt<CategoryDto>(); // Antes: _mapper.Map<CategoryDto>(category);
             return Ok(categoryDto);
         }
 
@@ -87,13 +89,14 @@ namespace ApiEcommerce.Controllers.V1
                 return BadRequest(ModelState);
             }
 
-            var category = _mapper.Map<Category>(categoryCreateDto);
+            var category = categoryCreateDto.Adapt<Category>(); // Antes: _mapper.Map<Category>(categoryCreateDto);
             if (!_categoryRepository.CreateCategory(category))
             {
                 ModelState.AddModelError("CustomError", $"Something went wrong when saving the record {category.Name}");
                 return StatusCode(500, ModelState);
             }
-            return CreatedAtRoute("GetCategoryById", new { id = category.Id }, _mapper.Map<CategoryDto>(category));
+            // Antes: _mapper.Map<CategoryDto>(category)
+            return CreatedAtRoute("GetCategoryById", new { id = category.Id }, category.Adapt<CategoryDto>());
         }
 
         [HttpPatch("{id:int}", Name = "UpdateCategory")]
@@ -120,7 +123,7 @@ namespace ApiEcommerce.Controllers.V1
                 return BadRequest(ModelState);
             }
 
-            var category = _mapper.Map<Category>(categoryDto);
+            var category = categoryDto.Adapt<Category>(); // Antes: _mapper.Map<Category>(categoryDto);
             category.Id = id;
             if (!_categoryRepository.UpdateCategory(category))
             {

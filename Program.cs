@@ -6,6 +6,7 @@ using ApiEcommerce.OpenApi;
 using ApiEcommerce.Repository;
 using ApiEcommerce.Repository.IRepository;
 using Asp.Versioning;
+using Mapster;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -42,10 +43,15 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
-builder.Services.AddAutoMapper(cfg =>
-{
-    cfg.AddMaps(typeof(Program).Assembly);
-});
+// Mapper: migrado de AutoMapper a Mapster (se usa el metodo de extension Adapt()).
+// Antes se hacia asi:
+// builder.Services.AddAutoMapper(cfg =>
+// {
+//     cfg.AddMaps(typeof(Program).Assembly);
+// });
+// Mapster no necesita registro en el contenedor: Adapt<T>() usa TypeAdapterConfig.GlobalSettings.
+// Scan() detecta las clases IRegister (Mapping/MappingRegister.cs) y las aplica a esa config global.
+TypeAdapterConfig.GlobalSettings.Scan(typeof(Program).Assembly);
 //Identity
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>()
