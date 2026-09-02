@@ -1,5 +1,6 @@
 using System.Text;
 using ApiEcommerce.Constants;
+using ApiEcommerce.Data;
 using ApiEcommerce.Models;
 using ApiEcommerce.OpenApi;
 using ApiEcommerce.Repository;
@@ -23,7 +24,15 @@ builder.Services.AddResponseCaching(options =>
 });
 
 // Add services to the container.
-builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(dbConnectionString));
+// builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(dbConnectionString));
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseSqlServer(dbConnectionString)
+    .UseSeeding((context, _) =>
+    {
+        var appContext = (ApplicationDbContext)context;
+        DataSeeder.SeedData(appContext);
+    })
+);
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();

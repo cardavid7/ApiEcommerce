@@ -1,4 +1,5 @@
 using System;
+using ApiEcommerce.Data;
 using ApiEcommerce.Models;
 using ApiEcommerce.Repository.IRepository;
 using Microsoft.EntityFrameworkCore;

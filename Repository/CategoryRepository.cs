@@ -1,3 +1,4 @@
+using ApiEcommerce.Data;
 using ApiEcommerce.Repository.IRepository;
 using ApiEcommerce.Models;
 
