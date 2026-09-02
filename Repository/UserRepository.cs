@@ -19,7 +19,7 @@ namespace ApiEcommerce.Repository;
 public class UserRepository : IUserRepository
 {
     private readonly ApplicationDbContext _dbContext;
-    private string? secretKey;
+    private readonly string? _secretKey;
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly RoleManager<IdentityRole> _roleManager;
     private readonly IMapper _mapper;
@@ -29,7 +29,7 @@ public class UserRepository : IUserRepository
         IMapper mapper)
     {
         _dbContext = dbContext;
-        secretKey = configuration.GetValue<string>("ApiSettings:SecretKey");
+        _secretKey = configuration.GetValue<string>("ApiSettings:SecretKey");
         _userManager = userManager;
         _roleManager = roleManager;
         _mapper = mapper;
@@ -99,13 +99,13 @@ public class UserRepository : IUserRepository
         }
 
         //JWT
-        if (string.IsNullOrWhiteSpace(secretKey))
+        if (string.IsNullOrWhiteSpace(_secretKey))
         {
             throw new InvalidOperationException("Secret key is not configured");
         }
 
         var roles = await _userManager.GetRolesAsync(user);
-        var key = Encoding.UTF8.GetBytes(secretKey);
+        var key = Encoding.UTF8.GetBytes(_secretKey);
         var handlerToken = new JwtSecurityTokenHandler();
 
         var claims = new List<Claim>
@@ -155,11 +155,12 @@ public class UserRepository : IUserRepository
             };
         }
 
+        // UserManager.CreateAsync se encarga de calcular NormalizedUserName y
+        // NormalizedEmail, no hace falta asignarlos a mano.
         var user = new ApplicationUser()
         {
             UserName = createUserDto.UserName,
             Email = createUserDto.UserName,
-            NormalizedEmail = createUserDto.UserName.ToUpper(),
             Name = createUserDto.Name
         };
 
