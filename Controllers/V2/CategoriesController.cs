@@ -58,9 +58,7 @@ namespace ApiEcommerce.Controllers.V2
         [ProducesResponseType(StatusCodes.Status200OK)]
         public IActionResult GetCategoryById(int id)
         {
-            System.Console.WriteLine($"Category with ID {id} : Datetime {DateTime.Now}");
             var category = _categoryRepository.GetCategoryById(id);
-            System.Console.WriteLine($"Category with ID {id}");
 
             if (category == null)
             {
