@@ -1,6 +1,7 @@
 using ApiEcommerce.Data;
 using ApiEcommerce.Repository.IRepository;
 using ApiEcommerce.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace ApiEcommerce.Repository;
 
@@ -53,7 +54,16 @@ public class CategoryRepository : ICategoryRepository
 
     public bool UpdateCategory(Category category)
     {
-        category.CreationDate = DateTime.Now;
+        // conservar la fecha de creación original (Update marca todas las columnas como modificadas)
+        var originalCreationDate = _dbContext.Categories
+            .AsNoTracking()
+            .Where(c => c.Id == category.Id)
+            .Select(c => (DateTime?)c.CreationDate)
+            .FirstOrDefault();
+        if (originalCreationDate.HasValue)
+        {
+            category.CreationDate = originalCreationDate.Value;
+        }
         _dbContext.Categories.Update(category);
         return Save();
     }
