@@ -32,6 +32,12 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
         var appContext = (ApplicationDbContext)context;
         DataSeeder.SeedData(appContext);
     })
+    .UseAsyncSeeding(async (context, _, cancellationToken) =>
+    {
+        var appContext = (ApplicationDbContext)context;
+        DataSeeder.SeedData(appContext);
+        await Task.CompletedTask;
+    })
 );
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
@@ -115,6 +121,14 @@ builder.Services.AddCors(options =>
 });
 
 var app = builder.Build();
+
+// Aplica las migraciones pendientes al arrancar y dispara el seeder (UseSeeding),
+// de modo que la base de datos queda creada y poblada sin pasos manuales.
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    dbContext.Database.Migrate();
+}
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
