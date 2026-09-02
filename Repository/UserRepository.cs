@@ -108,14 +108,17 @@ public class UserRepository : IUserRepository
         var key = Encoding.UTF8.GetBytes(secretKey);
         var handlerToken = new JwtSecurityTokenHandler();
 
+        var claims = new List<Claim>
+        {
+            new Claim("id", user.Id.ToString()),
+            new Claim("username", user.UserName ?? string.Empty)
+        };
+        // emitir un claim de rol por cada rol asignado al usuario
+        claims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role)));
+
         var tokenDescriptor = new SecurityTokenDescriptor()
         {
-            Subject = new ClaimsIdentity(new[]
-            {
-                new Claim("id", user.Id.ToString()),
-                new Claim("username", user.UserName ?? string.Empty),
-                new Claim(ClaimTypes.Role, roles.FirstOrDefault() ?? string.Empty)
-            }),
+            Subject = new ClaimsIdentity(claims),
             Expires = DateTime.UtcNow.AddHours(2),
             SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
         };
