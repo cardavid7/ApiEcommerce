@@ -57,6 +57,21 @@ public class ProductRepository : IProductRepository
         return _dbContext.Products.Include(p => p.Category).OrderBy(p => p.Name).ToList();
     }
 
+    public ICollection<Product> GetAllProductsInPages(int pageNumber, int pageSize)
+    {
+        return _dbContext.Products
+            .Include(p => p.Category)
+            .OrderBy(p => p.Id)
+            .Skip((pageNumber - 1) * pageSize)
+            .Take(pageSize)
+            .ToList();
+    }
+
+    public int GetTotalProducts()
+    {
+        return _dbContext.Products.Count();
+    }
+
     public Product? GetProductById(int productId)
     {
         if (productId <= 0)

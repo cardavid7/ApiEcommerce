@@ -39,6 +39,36 @@ namespace ApiEcommerce.Controllers
         }
 
         [AllowAnonymous]
+        [HttpGet("Paginated", Name = "GetProductsPaginated")]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public IActionResult GetProductsPaginated([FromQuery] PaginationDto paginationDto)
+        {
+            var totalProducts = _productRepository.GetTotalProducts();
+            var totalPages = (int)Math.Ceiling(totalProducts / (double)paginationDto.PageSize);
+
+            if (paginationDto.PageNumber > totalPages && totalPages > 0)
+            {
+                return BadRequest($"Page number {paginationDto.PageNumber} exceeds the total number of pages ({totalPages}).");
+            }
+
+            var products = _productRepository.GetAllProductsInPages(paginationDto.PageNumber, paginationDto.PageSize);
+            var productsDto = _mapper.Map<List<ProductDto>>(products);
+
+            var response = new PaginatedResponseDto<ProductDto>
+            {
+                TotalCount = totalProducts,
+                PageSize = paginationDto.PageSize,
+                CurrentPage = paginationDto.PageNumber,
+                TotalPages = totalPages,
+                Items = productsDto,
+            };
+
+            return Ok(response);
+        }
+
+        [AllowAnonymous]
         [HttpGet("{id:int}", Name = "GetProductById")]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
