@@ -56,6 +56,7 @@ public class UserRepository : IUserRepository
         {
             return new UserLoginResponseDto()
             {
+                IsSuccess = false,
                 User = null,
                 Token = string.Empty,
                 Message = "Username is required"
@@ -67,6 +68,7 @@ public class UserRepository : IUserRepository
         {
             return new UserLoginResponseDto()
             {
+                IsSuccess = false,
                 User = null,
                 Token = string.Empty,
                 Message = "Username not found"
@@ -77,6 +79,7 @@ public class UserRepository : IUserRepository
         {
             return new UserLoginResponseDto()
             {
+                IsSuccess = false,
                 User = null,
                 Token = string.Empty,
                 Message = "Password is required"
@@ -88,6 +91,7 @@ public class UserRepository : IUserRepository
         {
             return new UserLoginResponseDto()
             {
+                IsSuccess = false,
                 User = null,
                 Token = string.Empty,
                 Message = "Credentials are incorrect"
@@ -119,6 +123,7 @@ public class UserRepository : IUserRepository
         var token = handlerToken.CreateToken(tokenDescriptor);
         return new UserLoginResponseDto()
         {
+            IsSuccess = true,
             Token = handlerToken.WriteToken(token),
             User = _mapper.Map<UserDataDto>(user),
             Message = "User successfully logged in"

@@ -84,6 +84,7 @@ namespace ApiEcommerce.Controllers
         [HttpPost("Login", Name = "LoginUser")]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> LoginUser([FromBody] UserLoginDto userLoginDto)
@@ -93,12 +94,12 @@ namespace ApiEcommerce.Controllers
                 return BadRequest(ModelState);
             }
 
-            var user = await _userRepository.Login(userLoginDto);
-            if (user == null)
+            var response = await _userRepository.Login(userLoginDto);
+            if (!response.IsSuccess)
             {
-                return Unauthorized();
+                return Unauthorized(response.Message);
             }
-            return Ok(user);
+            return Ok(response);
         }
     }
 }
