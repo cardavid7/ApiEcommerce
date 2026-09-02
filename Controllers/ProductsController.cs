@@ -11,9 +11,9 @@ namespace ApiEcommerce.Controllers
 {
     [Route("api/v{version:apiVersion}/[controller]")]
     [ApiController]
-    [Authorize(Roles = "Admin")]
     [ApiVersion("1.0")]
     [ApiVersion("2.0")]
+    //Authorize(Roles = "Admin")], these endpoints are accessible to both Admin and User roles, so we will authorize them at the method level.
     public class ProductsController : ControllerBase
     {
         private readonly IProductRepository _productRepository;
@@ -85,6 +85,7 @@ namespace ApiEcommerce.Controllers
             return Ok(productDto);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         [Consumes("multipart/form-data")]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
@@ -131,6 +132,7 @@ namespace ApiEcommerce.Controllers
             return CreatedAtRoute("GetProductById", new { id = product.Id }, _mapper.Map<ProductDto>(createdProduct));
         }
 
+        [AllowAnonymous]
         [HttpGet("SearchByCategory/{categoryId:int}", Name = "GetProductsForCategory")]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -148,6 +150,7 @@ namespace ApiEcommerce.Controllers
             return Ok(productsDto);
         }
 
+        [AllowAnonymous]
         [HttpGet("SearchByNameOrDescription/{searchItem}", Name = "SearchProducts")]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -165,6 +168,7 @@ namespace ApiEcommerce.Controllers
             return Ok(productsDto);
         }
 
+        [Authorize(Roles = "Admin,User")]
         [HttpPatch("BuyProduct/{name}/{quantity:int}", Name = "BuyProduct")]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -190,6 +194,7 @@ namespace ApiEcommerce.Controllers
             return Ok($"Product {name} purchased successfully.");
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPut("{id:int}", Name = "UpdateProduct")]
         [Consumes("multipart/form-data")]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
@@ -249,6 +254,7 @@ namespace ApiEcommerce.Controllers
             return Ok(_mapper.Map<ProductDto>(updatedProduct));
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpDelete("{id:int}", Name = "DeleteProduct")]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
