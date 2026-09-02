@@ -124,11 +124,13 @@ public class UserRepository : IUserRepository
         };
         
         var token = handlerToken.CreateToken(tokenDescriptor);
+        var userData = _mapper.Map<UserDataDto>(user);
+        userData.Roles = roles.ToList();
         return new UserLoginResponseDto()
         {
             IsSuccess = true,
             Token = handlerToken.WriteToken(token),
-            User = _mapper.Map<UserDataDto>(user),
+            User = userData,
             Message = "User successfully logged in"
         };
     }
@@ -182,11 +184,13 @@ public class UserRepository : IUserRepository
         await _userManager.AddToRoleAsync(user, userRole);
 
         var createdUser = await _dbContext.ApplicationUsers.FirstOrDefaultAsync(u => u.UserName != null && u.UserName.ToLower().Trim() == createUserDto.UserName.ToLower().Trim());
+        var userData = _mapper.Map<UserDataDto>(createdUser);
+        userData.Roles = createdUser != null ? (await _userManager.GetRolesAsync(createdUser)).ToList() : new List<string>();
         return new UserRegisterResponseDto
         {
             IsSuccess = true,
             Message = "User successfully registered",
-            User = _mapper.Map<UserDataDto>(createdUser)
+            User = userData
         };
     }
 }
