@@ -108,9 +108,9 @@ builder.Services.AddOpenApi("v2", options =>
 //CORS
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowSpecificOrigin", builder =>
+    options.AddPolicy(PolicyNames.AllowSpecificOrigin, policy =>
     {
-        builder.WithOrigins("*").AllowAnyMethod().AllowAnyHeader();
+        policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
     });
 });
 
