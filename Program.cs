@@ -10,6 +10,7 @@ using Mapster;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
@@ -125,6 +126,18 @@ builder.Services.AddCors(options =>
     });
 });
 
+// Confía en los headers X-Forwarded-* que agrega el proxy de Render (u otro reverse proxy).
+// Sin esto, app.UseHttpsRedirection() puede terminar en loop: el proxy termina el TLS y
+// reenvía la request al contenedor por HTTP plano, y la app la vuelve a redirigir a HTTPS.
+builder.Services.Configure<ForwardedHeadersOptions>(options =>
+{
+    options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+    // Render no expone una lista fija de proxies/redes conocidas, así que se limpian
+    // esas listas para que no descarte los headers reenviados.
+    options.KnownIPNetworks.Clear();
+    options.KnownProxies.Clear();
+});
+
 var app = builder.Build();
 
 // Aplica las migraciones pendientes al arrancar y dispara el seeder (UseSeeding),
@@ -146,6 +159,8 @@ if (app.Environment.IsDevelopment())
         options.SwaggerEndpoint("/openapi/v2.json", "Mi API v2 (.NET 10)");
     });
 }
+
+app.UseForwardedHeaders();
 
 app.UseStaticFiles();
 
