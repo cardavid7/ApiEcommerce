@@ -39,11 +39,11 @@ public static class DataSeeder
         }
 
         appContext.Categories.AddRange(
-            new Category { Name = "Ropa y accesorios", CreationDate = DateTime.Now },
-            new Category { Name = "Electrónicos", CreationDate = DateTime.Now },
-            new Category { Name = "Deportes", CreationDate = DateTime.Now },
-            new Category { Name = "Hogar", CreationDate = DateTime.Now },
-            new Category { Name = "Libros", CreationDate = DateTime.Now }
+            new Category { Name = "Ropa y accesorios", CreationDate = DateTime.UtcNow },
+            new Category { Name = "Electrónicos", CreationDate = DateTime.UtcNow },
+            new Category { Name = "Deportes", CreationDate = DateTime.UtcNow },
+            new Category { Name = "Hogar", CreationDate = DateTime.UtcNow },
+            new Category { Name = "Libros", CreationDate = DateTime.UtcNow }
         );
         appContext.SaveChanges();
     }
@@ -148,7 +148,7 @@ public static class DataSeeder
                 Stock = p.Stock,
                 Category = category, // EF asigna CategoryId a partir de la navegación
                 ImgUrl = p.ImgUrl,
-                CreationDate = DateTime.Now
+                CreationDate = DateTime.UtcNow
             });
         }
 

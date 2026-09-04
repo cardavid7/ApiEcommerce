@@ -25,9 +25,8 @@ builder.Services.AddResponseCaching(options =>
 });
 
 // Add services to the container.
-// builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(dbConnectionString));
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(dbConnectionString)
+    options.UseNpgsql(dbConnectionString)
     .UseSeeding((context, _) =>
     {
         var appContext = (ApplicationDbContext)context;

@@ -11,7 +11,6 @@ using Mapster; // Antes: using AutoMapper; (migrado a Mapster, se usa el metodo 
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
-using Microsoft.Identity.Client;
 using Microsoft.IdentityModel.Tokens;
 
 namespace ApiEcommerce.Repository;

@@ -36,8 +36,8 @@ public class ProductRepository : IProductRepository
         {
             return false;
         }
-        product.CreationDate = DateTime.Now;
-        product.UpdateDate = DateTime.Now;
+        product.CreationDate = DateTime.UtcNow;
+        product.UpdateDate = DateTime.UtcNow;
         _dbContext.Products.Add(product);
         return Save();
     }
@@ -136,7 +136,7 @@ public class ProductRepository : IProductRepository
         {
             return false;
         }
-        product.UpdateDate = DateTime.Now;
+        product.UpdateDate = DateTime.UtcNow;
         // conservar la fecha de creación original (Update marca todas las columnas como modificadas)
         var originalCreationDate = _dbContext.Products
             .AsNoTracking()

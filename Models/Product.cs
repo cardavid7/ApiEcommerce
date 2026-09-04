@@ -28,7 +28,7 @@ public class Product
     [Range(0, int.MaxValue, ErrorMessage = "Stock must be a positive value.")]
     public int Stock { get; set; }
 
-    public DateTime CreationDate { get; set; } = DateTime.Now;
+    public DateTime CreationDate { get; set; } = DateTime.UtcNow;
 
     public DateTime? UpdateDate { get; set; } = null;
 

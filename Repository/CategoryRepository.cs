@@ -32,7 +32,7 @@ public class CategoryRepository : ICategoryRepository
 
     public bool CreateCategory(Category category)
     {
-        category.CreationDate = DateTime.Now;
+        category.CreationDate = DateTime.UtcNow;
         _dbContext.Categories.Add(category);
         return Save();
     }
