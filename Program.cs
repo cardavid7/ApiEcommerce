@@ -149,7 +149,10 @@ using (var scope = app.Services.CreateScope())
 }
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+// Swagger se activa/desactiva con "EnableSwagger" (appsettings.json / variable de entorno),
+// no atado al ambiente: por default está en true solo en Development (appsettings.Development.json)
+// y en false en el resto; en Render se puede prender con la variable de entorno EnableSwagger=true.
+if (app.Configuration.GetValue<bool>("EnableSwagger"))
 {
     app.MapOpenApi();
 
