@@ -1,0 +1,29 @@
+services:
+  - type: web
+    name: apiecommerce-backend
+    runtime: docker
+    rootDir: backend
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    plan: free
+    envVars:
+      - key: ASPNETCORE_ENVIRONMENT
+        value: Production
+      - key: EnableSwagger
+        value: "false"
+      - key: ApiSettings__SecretKey
+        sync: false
+      - key: ConnectionStrings__ConexionSql
+        sync: false
+
+# Cuando el frontend (Angular) este listo, agregar aqui un servicio "static site":
+#
+#  - type: web
+#    name: apiecommerce-frontend
+#    runtime: static
+#    rootDir: frontend
+#    buildCommand: npm ci && npm run build
+#    staticPublishPath: ./dist/<nombre-app>/browser
+#    envVars:
+#      - key: API_BASE_URL
+#        value: https://apiecommerce-backend.onrender.com

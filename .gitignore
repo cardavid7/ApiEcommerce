@@ -1,4 +1,7 @@
+# ---- Backend (.NET) ----
 # Build results
+backend/[Bb]in/
+backend/[Oo]bj/
 [Bb]in/
 [Oo]bj/
 [Oo]ut/
@@ -14,13 +17,23 @@
 .vscode/
 
 # ASP.NET Core
-appsettings.Development.json
-appsettings.Local.json
-secrets.json
+backend/appsettings.Development.json
+backend/appsettings.Local.json
+backend/secrets.json
 
 # Uploaded product images (user content, no debe versionarse)
-/wwwroot/ProductsImages/
+backend/wwwroot/ProductsImages/
 
+# Entity Framework / migrations local artifacts
+backend/Migrations/*.cs.sql
+
+# ---- Frontend (Angular) ----
+frontend/node_modules/
+frontend/dist/
+frontend/.angular/
+frontend/npm-debug.log*
+
+# ---- Common ----
 # Logs
 *.log
 
@@ -35,9 +48,6 @@ packages/
 
 # Test results
 TestResults/
-
-# Entity Framework / migrations local artifacts
-Migrations/*.cs.sql
 
 # Rider / JetBrains
 .idea/

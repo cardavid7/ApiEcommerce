@@ -4,7 +4,6 @@ obj/
 .vscode/
 **/*.user
 appsettings.Development.json
-docker-compose.yaml
 .git/
 .dockerignore
 Dockerfile
