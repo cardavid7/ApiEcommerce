@@ -118,11 +118,14 @@ builder.Services.AddOpenApi("v2", options =>
 });
 
 //CORS
+// Swagger no necesita estar en esta lista: se sirve desde el mismo origen que la API
+// (misma URL), y CORS solo aplica a peticiones cross-origin del navegador.
+var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? Array.Empty<string>();
 builder.Services.AddCors(options =>
 {
     options.AddPolicy(PolicyNames.AllowSpecificOrigin, policy =>
     {
-        policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
+        policy.WithOrigins(allowedOrigins).AllowAnyMethod().AllowAnyHeader();
     });
 });
 

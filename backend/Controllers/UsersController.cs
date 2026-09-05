@@ -72,7 +72,11 @@ namespace ApiEcommerce.Controllers
             {
                 return BadRequest("UserName already exists");
             }
-            
+
+            // Este endpoint es publico (AllowAnonymous): se ignora el rol que mande el
+            // cliente para evitar que cualquiera se autoasigne "Admin" al registrarse.
+            createUserDto.Role = "User";
+
             var result = await _userRepository.Register(createUserDto);
             if (!result.IsSuccess || result.User == null)
             {
