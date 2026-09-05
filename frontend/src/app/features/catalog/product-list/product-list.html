@@ -1,0 +1,76 @@
+<div>
+  <div class="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+    <h1 class="text-2xl font-bold text-slate-800">Catálogo</h1>
+
+    <div class="flex flex-col gap-2 sm:flex-row">
+      <form (ngSubmit)="search()" class="flex gap-2">
+        <input
+          type="search"
+          [(ngModel)]="searchTerm"
+          name="searchTerm"
+          placeholder="Buscar productos…"
+          class="w-56 rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-slate-500 focus:outline-none"
+        />
+        <button type="submit" class="rounded-md bg-slate-800 px-3 py-2 text-sm text-white hover:bg-slate-700">Buscar</button>
+      </form>
+
+      <select
+        (change)="filterByCategory($any($event.target).value)"
+        class="rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-slate-500 focus:outline-none"
+      >
+        <option value="">Todas las categorías</option>
+        @for (category of categories(); track category.id) {
+          <option [value]="category.id" [selected]="selectedCategoryId() === category.id">{{ category.name }}</option>
+        }
+      </select>
+    </div>
+  </div>
+
+  @if (errorMessage()) {
+    <p class="mb-4 rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">{{ errorMessage() }}</p>
+  }
+
+  @if (isLoading()) {
+    <p class="text-slate-500">Cargando…</p>
+  } @else if (products().length === 0) {
+    <p class="text-slate-500">No se encontraron productos.</p>
+  } @else {
+    <div class="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+      @for (product of products(); track product.id) {
+        <a
+          [routerLink]="['/products', product.id]"
+          class="flex flex-col overflow-hidden rounded-lg border border-slate-200 bg-white transition hover:shadow-md"
+        >
+          <img [src]="product.imgUrl ?? 'https://placehold.co/300x300'" [alt]="product.name" class="aspect-square w-full object-cover" />
+          <div class="flex flex-1 flex-col gap-1 p-3">
+            <p class="text-xs uppercase tracking-wide text-slate-400">{{ product.categoryName }}</p>
+            <p class="font-medium text-slate-800">{{ product.name }}</p>
+            <p class="mt-auto font-semibold text-slate-900">{{ product.price | currency }}</p>
+          </div>
+        </a>
+      }
+    </div>
+
+    @if (mode() === 'all' && totalPages() > 1) {
+      <div class="mt-6 flex items-center justify-center gap-2 text-sm">
+        <button
+          type="button"
+          (click)="goToPage(pageNumber() - 1)"
+          [disabled]="pageNumber() === 1"
+          class="rounded-md border border-slate-300 px-3 py-1.5 disabled:opacity-40"
+        >
+          Anterior
+        </button>
+        <span class="text-slate-500">Página {{ pageNumber() }} de {{ totalPages() }}</span>
+        <button
+          type="button"
+          (click)="goToPage(pageNumber() + 1)"
+          [disabled]="pageNumber() === totalPages()"
+          class="rounded-md border border-slate-300 px-3 py-1.5 disabled:opacity-40"
+        >
+          Siguiente
+        </button>
+      </div>
+    }
+  }
+</div>

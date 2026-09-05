@@ -1,0 +1,76 @@
+<div class="mx-auto max-w-sm">
+  <h1 class="mb-6 text-2xl font-bold text-slate-800">Crear cuenta</h1>
+
+  @if (errorMessage()) {
+    <p class="mb-4 rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">{{ errorMessage() }}</p>
+  }
+
+  <form [formGroup]="form" (ngSubmit)="submit()" class="flex flex-col gap-4">
+    <div>
+      <label class="mb-1 block text-sm font-medium text-slate-700" for="name">Nombre</label>
+      <input
+        id="name"
+        type="text"
+        formControlName="name"
+        class="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-slate-500 focus:outline-none"
+      />
+      @if (form.controls.name.invalid && form.controls.name.touched) {
+        <p class="mt-1 text-xs text-red-600">El nombre es obligatorio.</p>
+      }
+    </div>
+
+    <div>
+      <label class="mb-1 block text-sm font-medium text-slate-700" for="userName">Correo</label>
+      <input
+        id="userName"
+        type="email"
+        formControlName="userName"
+        class="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-slate-500 focus:outline-none"
+      />
+      @if (form.controls.userName.invalid && form.controls.userName.touched) {
+        <p class="mt-1 text-xs text-red-600">Ingresa un correo válido.</p>
+      }
+    </div>
+
+    <div>
+      <label class="mb-1 block text-sm font-medium text-slate-700" for="password">Contraseña</label>
+      <input
+        id="password"
+        type="password"
+        formControlName="password"
+        class="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-slate-500 focus:outline-none"
+      />
+      @if (form.controls.password.invalid && form.controls.password.touched) {
+        <p class="mt-1 text-xs text-red-600">
+          Mínimo 6 caracteres, con mayúscula, minúscula, número y un símbolo.
+        </p>
+      }
+    </div>
+
+    <div>
+      <label class="mb-1 block text-sm font-medium text-slate-700" for="confirmPassword">Confirmar contraseña</label>
+      <input
+        id="confirmPassword"
+        type="password"
+        formControlName="confirmPassword"
+        class="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-slate-500 focus:outline-none"
+      />
+      @if (form.errors?.['passwordMismatch'] && form.controls.confirmPassword.touched) {
+        <p class="mt-1 text-xs text-red-600">Las contraseñas no coinciden.</p>
+      }
+    </div>
+
+    <button
+      type="submit"
+      [disabled]="isSubmitting()"
+      class="rounded-md bg-slate-800 px-4 py-2 text-sm font-medium text-white hover:bg-slate-700 disabled:opacity-50"
+    >
+      {{ isSubmitting() ? 'Creando cuenta…' : 'Crear cuenta' }}
+    </button>
+  </form>
+
+  <p class="mt-4 text-center text-sm text-slate-500">
+    ¿Ya tienes cuenta?
+    <a routerLink="/login" class="font-medium text-slate-800 hover:underline">Inicia sesión</a>
+  </p>
+</div>

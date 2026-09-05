@@ -1,0 +1,68 @@
+@if (isLoading()) {
+  <p class="text-slate-500">Cargando…</p>
+} @else if (notFound()) {
+  <div class="text-center">
+    <p class="text-slate-500">Producto no encontrado.</p>
+    <a routerLink="/" class="mt-2 inline-block text-slate-800 hover:underline">Volver al catálogo</a>
+  </div>
+} @else if (product(); as product) {
+  <div class="grid gap-8 md:grid-cols-2">
+    <img [src]="product.imgUrl ?? 'https://placehold.co/500x500'" [alt]="product.name" class="w-full rounded-lg border border-slate-200 object-cover" />
+
+    <div>
+      <p class="text-xs uppercase tracking-wide text-slate-400">{{ product.categoryName }}</p>
+      <h1 class="mt-1 text-2xl font-bold text-slate-800">{{ product.name }}</h1>
+      <p class="mt-2 text-2xl font-semibold text-slate-900">{{ product.price | currency }}</p>
+      <p class="mt-4 text-slate-600">{{ product.description }}</p>
+
+      <p class="mt-4 text-sm text-slate-500">SKU: {{ product.sku }}</p>
+      <p class="text-sm text-slate-500">
+        Disponibilidad:
+        @if (product.stock > 0) {
+          <span class="font-medium text-emerald-600">{{ product.stock }} en stock</span>
+        } @else {
+          <span class="font-medium text-red-600">Agotado</span>
+        }
+      </p>
+
+      <div class="mt-6 border-t border-slate-200 pt-6">
+        @if (!authService.isAuthenticated()) {
+          <p class="text-sm text-slate-500">
+            <a routerLink="/login" [queryParams]="{ returnUrl: '/products/' + product.id }" class="font-medium text-slate-800 hover:underline">
+              Inicia sesión
+            </a>
+            para comprar este producto.
+          </p>
+        } @else if (product.stock === 0) {
+          <button type="button" disabled class="rounded-md bg-slate-200 px-4 py-2 text-sm font-medium text-slate-500">Agotado</button>
+        } @else {
+          @if (purchaseMessage()) {
+            <p class="mb-3 rounded-md bg-emerald-50 px-3 py-2 text-sm text-emerald-700">{{ purchaseMessage() }}</p>
+          }
+          @if (purchaseError()) {
+            <p class="mb-3 rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">{{ purchaseError() }}</p>
+          }
+
+          <div class="flex items-center gap-3">
+            <input
+              type="number"
+              min="1"
+              [max]="product.stock"
+              [ngModel]="quantity()"
+              (ngModelChange)="quantity.set($event)"
+              class="w-20 rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-slate-500 focus:outline-none"
+            />
+            <button
+              type="button"
+              (click)="buy()"
+              [disabled]="isPurchasing()"
+              class="rounded-md bg-slate-800 px-4 py-2 text-sm font-medium text-white hover:bg-slate-700 disabled:opacity-50"
+            >
+              {{ isPurchasing() ? 'Comprando…' : 'Comprar' }}
+            </button>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+}

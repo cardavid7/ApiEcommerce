@@ -1,0 +1,54 @@
+<div class="mx-auto max-w-sm">
+  <h1 class="mb-6 text-2xl font-bold text-slate-800">Iniciar sesión</h1>
+
+  @if (justRegistered) {
+    <p class="mb-4 rounded-md bg-emerald-50 px-3 py-2 text-sm text-emerald-700">
+      Cuenta creada correctamente. Ahora puedes iniciar sesión.
+    </p>
+  }
+
+  @if (errorMessage()) {
+    <p class="mb-4 rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">{{ errorMessage() }}</p>
+  }
+
+  <form [formGroup]="form" (ngSubmit)="submit()" class="flex flex-col gap-4">
+    <div>
+      <label class="mb-1 block text-sm font-medium text-slate-700" for="userName">Correo</label>
+      <input
+        id="userName"
+        type="email"
+        formControlName="userName"
+        class="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-slate-500 focus:outline-none"
+      />
+      @if (form.controls.userName.invalid && form.controls.userName.touched) {
+        <p class="mt-1 text-xs text-red-600">Ingresa un correo válido.</p>
+      }
+    </div>
+
+    <div>
+      <label class="mb-1 block text-sm font-medium text-slate-700" for="password">Contraseña</label>
+      <input
+        id="password"
+        type="password"
+        formControlName="password"
+        class="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-slate-500 focus:outline-none"
+      />
+      @if (form.controls.password.invalid && form.controls.password.touched) {
+        <p class="mt-1 text-xs text-red-600">La contraseña es obligatoria.</p>
+      }
+    </div>
+
+    <button
+      type="submit"
+      [disabled]="isSubmitting()"
+      class="rounded-md bg-slate-800 px-4 py-2 text-sm font-medium text-white hover:bg-slate-700 disabled:opacity-50"
+    >
+      {{ isSubmitting() ? 'Ingresando…' : 'Ingresar' }}
+    </button>
+  </form>
+
+  <p class="mt-4 text-center text-sm text-slate-500">
+    ¿No tienes cuenta?
+    <a routerLink="/register" class="font-medium text-slate-800 hover:underline">Regístrate</a>
+  </p>
+</div>

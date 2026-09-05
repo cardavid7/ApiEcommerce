@@ -1,0 +1,39 @@
+<div class="flex min-h-screen flex-col bg-slate-50">
+  <header class="border-b border-slate-200 bg-white">
+    <nav class="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
+      <a routerLink="/" class="text-lg font-bold text-slate-800">ApiEcommerce</a>
+
+      <div class="flex items-center gap-4 text-sm">
+        <a routerLink="/" routerLinkActive="text-slate-900 font-semibold" [routerLinkActiveOptions]="{ exact: true }" class="text-slate-600 hover:text-slate-900">
+          Catálogo
+        </a>
+
+        @if (authService.isAuthenticated()) {
+          @if (authService.hasRole('Admin')) {
+            <a routerLink="/admin/products" class="text-slate-600 hover:text-slate-900">Administración</a>
+          }
+          <a routerLink="/profile" routerLinkActive="text-slate-900 font-semibold" class="text-slate-600 hover:text-slate-900">
+            Mi perfil
+          </a>
+          <span class="text-slate-400">{{ authService.currentUser()?.name }}</span>
+          <button type="button" (click)="logout()" class="rounded-md bg-slate-100 px-3 py-1.5 text-slate-700 hover:bg-slate-200">
+            Cerrar sesión
+          </button>
+        } @else {
+          <a routerLink="/login" class="text-slate-600 hover:text-slate-900">Ingresar</a>
+          <a routerLink="/register" class="rounded-md bg-slate-800 px-3 py-1.5 text-white hover:bg-slate-700">
+            Crear cuenta
+          </a>
+        }
+      </div>
+    </nav>
+  </header>
+
+  <main class="mx-auto w-full max-w-6xl flex-1 px-4 py-8">
+    <router-outlet />
+  </main>
+
+  <footer class="border-t border-slate-200 bg-white py-4 text-center text-sm text-slate-400">
+    ApiEcommerce &copy; {{ currentYear }}
+  </footer>
+</div>
