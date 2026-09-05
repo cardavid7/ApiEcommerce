@@ -17,6 +17,10 @@ using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 var dbConnectionString = builder.Configuration.GetConnectionString("ConexionSql");
+// Host publico de la API (sin request HTTP disponible en el seeding no se puede
+// derivar de HttpContext como en UploadProductImage): en Render, sobreescribir
+// con la variable de entorno PublicBaseUrl.
+var publicBaseUrl = builder.Configuration.GetValue<string>("PublicBaseUrl") ?? string.Empty;
 
 // Cache
 builder.Services.AddResponseCaching(options =>
@@ -31,12 +35,12 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     .UseSeeding((context, _) =>
     {
         var appContext = (ApplicationDbContext)context;
-        DataSeeder.SeedData(appContext);
+        DataSeeder.SeedData(appContext, publicBaseUrl);
     })
     .UseAsyncSeeding(async (context, _, cancellationToken) =>
     {
         var appContext = (ApplicationDbContext)context;
-        DataSeeder.SeedData(appContext);
+        DataSeeder.SeedData(appContext, publicBaseUrl);
         await Task.CompletedTask;
     })
 );

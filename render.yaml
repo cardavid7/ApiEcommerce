@@ -15,10 +15,12 @@ services:
         sync: false
       - key: ConnectionStrings__ConexionSql
         sync: false
-      # Verificar que coincida con la URL real que Render asigne al static site
-      # de abajo (puede variar si "apiecommerce-frontend" ya esta tomado).
+      # Verificar que coincidan con las URLs reales que Render asigne a cada
+      # servicio (pueden variar si el nombre ya esta tomado).
       - key: Cors__AllowedOrigins__0
         value: https://apiecommerce-frontend.onrender.com
+      - key: PublicBaseUrl
+        value: https://apiecommerce-backend.onrender.com
 
   - type: web
     name: apiecommerce-frontend

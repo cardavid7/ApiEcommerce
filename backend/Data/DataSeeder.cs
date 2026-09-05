@@ -6,7 +6,7 @@ namespace ApiEcommerce.Data;
 
 public static class DataSeeder
 {
-    public static void SeedData(ApplicationDbContext appContext)
+    public static void SeedData(ApplicationDbContext appContext, string publicBaseUrl)
     {
         SeedRoles(appContext);
         SeedCategories(appContext);
@@ -14,7 +14,7 @@ public static class DataSeeder
         SeedUserRoles(appContext);
         // Los productos se siembran al final porque necesitan las categorías ya
         // persistidas (con su Id real generado por la base de datos).
-        SeedProducts(appContext);
+        SeedProducts(appContext, publicBaseUrl);
     }
 
     private static void SeedRoles(ApplicationDbContext appContext)
@@ -104,7 +104,7 @@ public static class DataSeeder
         appContext.UserRoles.Add(new IdentityUserRole<string> { UserId = userId, RoleId = roleId });
     }
 
-    private static void SeedProducts(ApplicationDbContext appContext)
+    private static void SeedProducts(ApplicationDbContext appContext, string publicBaseUrl)
     {
         if (appContext.Products.Any())
         {
@@ -115,20 +115,22 @@ public static class DataSeeder
         // de que la BD haya generado los Id 1..5 en ese orden.
         var categoriesByName = appContext.Categories.ToDictionary(c => c.Name);
 
-        var products = new (string Name, string Description, decimal Price, string Sku, int Stock, string Category, string ImgUrl)[]
+        // Las imagenes viven en wwwroot/ProductsImages/seed (committeadas al repo,
+        // a diferencia de las subidas por usuarios), servidas via UseStaticFiles().
+        var products = new (string Name, string Description, decimal Price, string Sku, int Stock, string Category, string ImgFileName)[]
         {
-            ("Camiseta Básica", "Camiseta de algodón 100%", 25.99m, "PROD-001-CAM-M", 50, "Ropa y accesorios", "https://via.placeholder.com/300x300/FF0000/FFFFFF?text=Camiseta"),
-            ("Smartphone Galaxy", "Teléfono inteligente con 128GB", 599.99m, "PROD-002-PHO-BLK", 25, "Electrónicos", "https://via.placeholder.com/300x300/0000FF/FFFFFF?text=Smartphone"),
-            ("Pelota de Fútbol", "Pelota oficial FIFA", 45.00m, "PROD-003-BAL-WHT", 30, "Deportes", "https://via.placeholder.com/300x300/00FF00/FFFFFF?text=Pelota"),
-            ("Lámpara de Mesa", "Lámpara LED regulable", 89.99m, "PROD-004-LAM-WHT", 15, "Hogar", "https://via.placeholder.com/300x300/FFFF00/000000?text=Lampara"),
-            ("El Quijote", "Novela clásica de Cervantes", 19.99m, "PROD-005-LIB-ESP", 100, "Libros", "https://via.placeholder.com/300x300/800080/FFFFFF?text=Libro"),
-            ("Jeans Clásicos", "Pantalones vaqueros azules", 79.99m, "PROD-006-PAN-BLU", 40, "Ropa y accesorios", "https://via.placeholder.com/300x300/4169E1/FFFFFF?text=Jeans"),
-            ("Tablet Pro", "Tablet 10.5 pulgadas con stylus incluido", 459.99m, "PROD-007-TAB-SIL", 20, "Electrónicos", "https://via.placeholder.com/300x300/C0C0C0/000000?text=Tablet"),
-            ("Zapatillas Running", "Zapatillas deportivas para correr", 129.99m, "PROD-008-ZAP-BLK", 35, "Deportes", "https://via.placeholder.com/300x300/000000/FFFFFF?text=Zapatillas"),
-            ("Cafetera Express", "Cafetera automática con molinillo integrado", 299.99m, "PROD-009-CAF-BLK", 12, "Hogar", "https://via.placeholder.com/300x300/2F4F4F/FFFFFF?text=Cafetera"),
-            ("Programación en C#", "Guía completa de programación en C# y .NET", 49.99m, "PROD-010-LIB-ESP", 80, "Libros", "https://via.placeholder.com/300x300/008B8B/FFFFFF?text=C%23+Book"),
-            ("Chaqueta Deportiva", "Chaqueta impermeable para actividades al aire libre", 149.99m, "PROD-011-CHA-NAV", 28, "Ropa y accesorios", "https://via.placeholder.com/300x300/000080/FFFFFF?text=Chaqueta"),
-            ("Auriculares Bluetooth", "Auriculares inalámbricos con cancelación de ruido", 189.99m, "PROD-012-AUR-BLK", 45, "Electrónicos", "https://via.placeholder.com/300x300/1C1C1C/FFFFFF?text=Auriculares"),
+            ("Camiseta Básica", "Camiseta de algodón 100%", 25.99m, "PROD-001-CAM-M", 50, "Ropa y accesorios", "camiseta-basica.jpg"),
+            ("Smartphone Galaxy", "Teléfono inteligente con 128GB", 599.99m, "PROD-002-PHO-BLK", 25, "Electrónicos", "smartphone-galaxy.jpg"),
+            ("Pelota de Fútbol", "Pelota oficial FIFA", 45.00m, "PROD-003-BAL-WHT", 30, "Deportes", "pelota-futbol.jpg"),
+            ("Lámpara de Mesa", "Lámpara LED regulable", 89.99m, "PROD-004-LAM-WHT", 15, "Hogar", "lampara-mesa.jpg"),
+            ("El Quijote", "Novela clásica de Cervantes", 19.99m, "PROD-005-LIB-ESP", 100, "Libros", "el-quijote.jpg"),
+            ("Jeans Clásicos", "Pantalones vaqueros azules", 79.99m, "PROD-006-PAN-BLU", 40, "Ropa y accesorios", "jeans-clasicos.jpg"),
+            ("Tablet Pro", "Tablet 10.5 pulgadas con stylus incluido", 459.99m, "PROD-007-TAB-SIL", 20, "Electrónicos", "tablet-pro.jpg"),
+            ("Zapatillas Running", "Zapatillas deportivas para correr", 129.99m, "PROD-008-ZAP-BLK", 35, "Deportes", "zapatillas-running.jpg"),
+            ("Cafetera Express", "Cafetera automática con molinillo integrado", 299.99m, "PROD-009-CAF-BLK", 12, "Hogar", "cafetera-express.jpg"),
+            ("Programación en C#", "Guía completa de programación en C# y .NET", 49.99m, "PROD-010-LIB-ESP", 80, "Libros", "programacion-csharp.jpg"),
+            ("Chaqueta Deportiva", "Chaqueta impermeable para actividades al aire libre", 149.99m, "PROD-011-CHA-NAV", 28, "Ropa y accesorios", "chaqueta-deportiva.jpg"),
+            ("Auriculares Bluetooth", "Auriculares inalámbricos con cancelación de ruido", 189.99m, "PROD-012-AUR-BLK", 45, "Electrónicos", "auriculares-bluetooth.jpg"),
         };
 
         foreach (var p in products)
@@ -147,7 +149,7 @@ public static class DataSeeder
                 SKU = p.Sku,
                 Stock = p.Stock,
                 Category = category, // EF asigna CategoryId a partir de la navegación
-                ImgUrl = p.ImgUrl,
+                ImgUrl = $"{publicBaseUrl}/ProductsImages/seed/{p.ImgFileName}",
                 CreationDate = DateTime.UtcNow
             });
         }

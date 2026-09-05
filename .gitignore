@@ -21,8 +21,11 @@ backend/appsettings.Development.json
 backend/appsettings.Local.json
 backend/secrets.json
 
-# Uploaded product images (user content, no debe versionarse)
-backend/wwwroot/ProductsImages/
+# Uploaded product images (user content, no debe versionarse) -
+# excepto seed/, que son las fotos iniciales committeadas con el repo.
+backend/wwwroot/ProductsImages/*
+!backend/wwwroot/ProductsImages/seed/
+!backend/wwwroot/ProductsImages/seed/**
 
 # Entity Framework / migrations local artifacts
 backend/Migrations/*.cs.sql
