@@ -13,4 +13,6 @@ public class UserDto
 
     [Required(ErrorMessage = "Username is required")]
     public string? UserName { get; set; }
+
+    public ICollection<string> Roles { get; set; } = new List<string>();
 }

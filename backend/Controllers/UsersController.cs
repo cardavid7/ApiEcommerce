@@ -1,9 +1,11 @@
+using ApiEcommerce.Models;
 using ApiEcommerce.Models.Dtos;
 using ApiEcommerce.Repository.IRepository;
 using Asp.Versioning;
 using Mapster; // Antes: using AutoMapper; (migrado a Mapster, se usa el metodo de extension Adapt())
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ApiEcommerce.Controllers
@@ -16,22 +18,31 @@ namespace ApiEcommerce.Controllers
     public class UsersController : ControllerBase
     {
         private readonly IUserRepository _userRepository;
+        private readonly UserManager<ApplicationUser> _userManager;
         // Con Mapster se usa el metodo de extension Adapt(); ya no se inyecta un mapper.
         // Antes (AutoMapper): private readonly IMapper _mapper;
 
-        public UsersController(IUserRepository userRepository) // Antes: UsersController(IUserRepository userRepository, IMapper mapper)
+        public UsersController(IUserRepository userRepository, UserManager<ApplicationUser> userManager)
+        // Antes: UsersController(IUserRepository userRepository, IMapper mapper)
         {
             _userRepository = userRepository;
+            _userManager = userManager;
             // Antes: _mapper = mapper;
         }
-        
+
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public IActionResult GetUsers()
+        public async Task<IActionResult> GetUsers()
         {
             var users = _userRepository.GetUsers();
-            var usersDto = users.Adapt<List<UserDto>>(); // Antes: _mapper.Map<List<UserDto>>(users);
+            var usersDto = new List<UserDto>();
+            foreach (var user in users)
+            {
+                var userDto = user.Adapt<UserDto>(); // Antes: _mapper.Map<UserDto>(user);
+                userDto.Roles = await _userManager.GetRolesAsync(user);
+                usersDto.Add(userDto);
+            }
             return Ok(usersDto);
         }
 
@@ -40,7 +51,7 @@ namespace ApiEcommerce.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public IActionResult GetUserById(string id)
+        public async Task<IActionResult> GetUserById(string id)
         {
             var user = _userRepository.GetUserById(id);
             if (user == null)
@@ -49,6 +60,7 @@ namespace ApiEcommerce.Controllers
             }
 
             var userDto = user.Adapt<UserDto>(); // Antes: _mapper.Map<UserDto>(user);
+            userDto.Roles = await _userManager.GetRolesAsync(user);
             return Ok(userDto);
         }
 
